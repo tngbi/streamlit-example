@@ -2,15 +2,14 @@ import streamlit as st
 import pandas as pd
 import hvplot.pandas  # Import hvPlot
 
-# Assuming the hvplot will work with streamlit which might require additional setup
+# Make sure the required libraries are installed: pandas, hvplot, openpyxl
 
-# Load the data
-@st.cache
+@st.cache  # Use the appropriate caching decorator
 def load_data(year):
-    excel_file = ('./sample_sales_team_data.xlsx')
+    excel_file = 'sample_sales_team_data.xlsx'  # Ensure this file exists in the directory
     return pd.read_excel(excel_file, sheet_name=str(year), index_col=0)
 
-data = load_data(2022)
+data = load_data(2022)  # Load initial data
 
 # Team Selector
 team_selector = st.sidebar.radio(
@@ -39,7 +38,7 @@ def plot_performance(team, year):
     # Plotting Revenue
     revenue_plot = data.hvplot.bar(
         x='Quarter',
-        y=[f'{team} Revenue Target', f'{team} Revenue Achievement'],
+        y=[f'{team} Revenue Target', f'{team} Sales Achievement'],
         color=colors,
         title=f'Revenue Target vs Achievement for {team}, Year: {year}',
         legend='top_right'
@@ -48,7 +47,6 @@ def plot_performance(team, year):
     # Return both plots
     return sales_plot, revenue_plot
 
-# Main App
 def main():
     st.title("Sales Dashboard")
     
