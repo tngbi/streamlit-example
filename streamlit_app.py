@@ -1,40 +1,64 @@
-import altair as alt
-import numpy as np
-import pandas as pd
 import streamlit as st
+import pandas as pd
+import hvplot.pandas  # Import hvPlot
 
-"""
-# Welcome to Streamlit!
+# Assuming the hvplot will work with streamlit which might require additional setup
 
-Edit `/streamlit_app.py` to customize this app to your heart's desire :heart:.
-If you have any questions, checkout our [documentation](https://docs.streamlit.io) and [community
-forums](https://discuss.streamlit.io).
+# Load the data
+@st.cache
+def load_data(year):
+    excel_file = ('/home/biteam/.virtualenvs/bienv/upload/sample_sales_team_data.xlsx')
+    return pd.read_excel(excel_file, sheet_name=str(year), index_col=0)
 
-In the meantime, below is an example of what you can do with just a few lines of code:
-"""
+data = load_data(2022)
 
-num_points = st.slider("Number of points in spiral", 1, 10000, 1100)
-num_turns = st.slider("Number of turns in spiral", 1, 300, 31)
+# Team Selector
+team_selector = st.sidebar.radio(
+    'Team Selector',
+    ['Hunter', 'Farmer', 'Channel', 'SMB']
+)
 
-indices = np.linspace(0, 1, num_points)
-theta = 2 * np.pi * num_turns * indices
-radius = indices
+# Year Slider
+year_slider = st.sidebar.slider('Year', 2020, 2023, 2022)
 
-x = radius * np.cos(theta)
-y = radius * np.sin(theta)
+def plot_performance(team, year):
+    data = load_data(year)  # Load the appropriate year's data
 
-df = pd.DataFrame({
-    "x": x,
-    "y": y,
-    "idx": indices,
-    "rand": np.random.randn(num_points),
-})
+    # Define colors for each type
+    colors = ['blue', 'green']  # blue for Target, green for Achievement
 
-st.altair_chart(alt.Chart(df, height=700, width=700)
-    .mark_point(filled=True)
-    .encode(
-        x=alt.X("x", axis=None),
-        y=alt.Y("y", axis=None),
-        color=alt.Color("idx", legend=None, scale=alt.Scale()),
-        size=alt.Size("rand", legend=None, scale=alt.Scale(range=[1, 150])),
-    ))
+    # Plotting Sales
+    sales_plot = data.hvplot.bar(
+        x='Quarter',
+        y=[f'{team} Sales Target', f'{team} Sales Achievement'],
+        color=colors,
+        title=f'Sales Target vs Achievement for {team}, Year: {year}',
+        legend='top_right'
+    )
+
+    # Plotting Revenue
+    revenue_plot = data.hvplot.bar(
+        x='Quarter',
+        y=[f'{team} Revenue Target', f'{team} Revenue Achievement'],
+        color=colors,
+        title=f'Revenue Target vs Achievement for {team}, Year: {year}',
+        legend='top_right'
+    )
+
+    # Return both plots
+    return sales_plot, revenue_plot
+
+# Main App
+def main():
+    st.title("Sales Dashboard")
+    
+    # Displaying the plots
+    team = team_selector
+    year = year_slider
+    sales_plot, revenue_plot = plot_performance(team, year)
+    
+    st.write(sales_plot)
+    st.write(revenue_plot)
+
+if __name__ == "__main__":
+    main()
