@@ -7,7 +7,7 @@ import hvplot.pandas  # Import hvPlot
 # Load the data
 @st.cache
 def load_data(year):
-    excel_file = ('sample_sales_team_data.xlsx')
+    excel_file = ('./sample_sales_team_data.xlsx')
     return pd.read_excel(excel_file, sheet_name=str(year), index_col=0)
 
 data = load_data(2022)
