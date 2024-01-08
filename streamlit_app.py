@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # Replace st.cache_data with st.cache, as st.cache_data is not standard in Streamlit
-@st.cache
+@st.cache_data
 def load_data(year):
     excel_file = 'sample_sales_team_data.xlsx'  # Ensure this file exists in the directory
     return pd.read_excel(excel_file, sheet_name=str(year), index_col=0)
