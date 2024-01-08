@@ -1,21 +1,18 @@
 import streamlit as st
 import pandas as pd
-import hvplot.pandas  # Import hvPlot
+import matplotlib.pyplot as plt
 
-# Make sure the required libraries are installed: pandas, hvplot, openpyxl
-
-@st.cache_data  # Use the appropriate caching decorator
+# Replace st.cache_data with st.cache, as st.cache_data is not standard in Streamlit
+@st.cache
 def load_data(year):
     excel_file = 'sample_sales_team_data.xlsx'  # Ensure this file exists in the directory
     return pd.read_excel(excel_file, sheet_name=str(year), index_col=0)
 
-data = load_data(2022)  # Load initial data
+# Load initial data
+data = load_data(2022)
 
 # Team Selector
-team_selector = st.sidebar.radio(
-    'Team Selector',
-    ['Hunter', 'Farmer', 'Channel', 'SMB']
-)
+team_selector = st.sidebar.radio('Team Selector', ['Hunter', 'Farmer', 'Channel', 'SMB'])
 
 # Year Slider
 year_slider = st.sidebar.slider('Year', 2020, 2023, 2022)
@@ -23,40 +20,35 @@ year_slider = st.sidebar.slider('Year', 2020, 2023, 2022)
 def plot_performance(team, year):
     data = load_data(year)  # Load the appropriate year's data
 
-    # Define colors for each type
-    colors = ['blue', 'green']  # blue for Target, green for Achievement
+    # Creating two subplots for sales and revenue
+    fig, axes = plt.subplots(nrows=2, ncols=1, figsize=(8, 6))
 
     # Plotting Sales
-    sales_plot = data.hvplot.bar(
-        x='Quarter',
-        y=[f'{team} Sales Target', f'{team} Sales Achievement'],
-        color=colors,
-        title=f'Sales Target vs Achievement for {team}, Year: {year}',
-        legend='top_right'
-    )
+    data[[f'{team} Sales Target', f'{team} Sales Achievement']].plot(kind='bar', ax=axes[0], color=['blue', 'green'])
+    axes[0].set_title(f'Sales Target vs Achievement for {team}, Year: {year}')
+    axes[0].set_xlabel('Quarter')
+    axes[0].set_ylabel('Sales')
 
     # Plotting Revenue
-    revenue_plot = data.hvplot.bar(
-        x='Quarter',
-        y=[f'{team} Revenue Target', f'{team} Sales Achievement'],
-        color=colors,
-        title=f'Revenue Target vs Achievement for {team}, Year: {year}',
-        legend='top_right'
-    )
+    data[[f'{team} Revenue Target', f'{team} Sales Achievement']].plot(kind='bar', ax=axes[1], color=['blue', 'green'])
+    axes[1].set_title(f'Revenue Target vs Achievement for {team}, Year: {year}')
+    axes[1].set_xlabel('Quarter')
+    axes[1].set_ylabel('Revenue')
 
-    # Return both plots
-    return sales_plot, revenue_plot
+    # Adjusting layout
+    plt.tight_layout()
+
+    return fig
 
 def main():
     st.title("Sales Dashboard")
-    
+
     # Displaying the plots
     team = team_selector
     year = year_slider
-    sales_plot, revenue_plot = plot_performance(team, year)
-    
-    st.write(sales_plot)
-    st.write(revenue_plot)
+    plot_fig = plot_performance(team, year)
+
+    st.pyplot(plot_fig)
 
 if __name__ == "__main__":
     main()
