@@ -1,5 +1,5 @@
 import streamlit as st
-import pandas as pd, numpy as np
+import pandas as pd
 import hvplot.pandas  # Import hvPlot
 
 # Make sure the required libraries are installed: pandas, hvplot, openpyxl
