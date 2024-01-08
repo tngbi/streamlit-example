@@ -4,7 +4,7 @@ import hvplot.pandas  # Import hvPlot
 
 # Make sure the required libraries are installed: pandas, hvplot, openpyxl
 
-@st.cache  # Use the appropriate caching decorator
+@st.cache_data  # Use the appropriate caching decorator
 def load_data(year):
     excel_file = 'sample_sales_team_data.xlsx'  # Ensure this file exists in the directory
     return pd.read_excel(excel_file, sheet_name=str(year), index_col=0)
