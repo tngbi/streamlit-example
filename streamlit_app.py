@@ -46,7 +46,6 @@ def plot_performance(team, year):
 
     # Return both plots
     return sales_plot, revenue_plot
-st.bokeh_chart(hvplot_object)
 
 def main():
     st.title("Sales Dashboard")
